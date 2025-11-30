@@ -1,0 +1,5 @@
+{
+  "name": "Sentinel - Web3 Risk Tracker",
+  "description": "A SlowMist-inspired Web3 wallet security analyzer. It tracks transactions and uses AI to identify high-risk interactions, potential phishing attempts, and suspicious wallet patterns.",
+  "requestFramePermissions": []
+}
