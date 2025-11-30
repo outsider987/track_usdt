@@ -14,7 +14,7 @@ function App() {
   const [profile, setProfile] = useState<WalletProfile | null>(null);
   const [analysis, setAnalysis] = useState<RiskAnalysis | null>(null);
   const [error, setError] = useState('');
-  const [isDemoMode, setIsDemoMode] = useState(false);
+
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,32 +30,31 @@ function App() {
     setError('');
     setProfile(null);
     setAnalysis(null);
-    setIsDemoMode(false);
 
-    let transactions = [];
-    let walletProfile: WalletProfile | null = null;
+
+    let transactions;
+    let walletProfile;
 
     try {
-      // 1. Try Fetch Real Data from TronGrid
+      // 1. Fetch Real Data from TronGrid
       const [realTxs, realProfile] = await Promise.all([
         fetchTronTransactions(address),
-        fetchTronWalletProfile(address)
+        fetchTronWalletProfile(address),
       ]);
 
       if (realTxs.length === 0 && !realProfile) {
-        throw new Error("No data found");
+        setError("No transactions found for this address.");
+        setLoading(false);
+        return;
       }
 
       transactions = realTxs;
       walletProfile = realProfile;
-
     } catch (err: any) {
-      console.warn("TronGrid API failed or empty, falling back to mock:", err);
-      // Fallback to Mock Data
-      setIsDemoMode(true);
-      transactions = fetchMockTransactions(address);
-      walletProfile = fetchMockWalletProfile(address);
-      await new Promise(resolve => setTimeout(resolve, 800));
+      console.error("TronGrid API failed:", err);
+      setError("Failed to fetch data from TronGrid. Check your API key and network.");
+      setLoading(false);
+      return;
     }
 
     if (walletProfile) {
@@ -148,12 +147,7 @@ function App() {
             </button>
           </form>
           {error && <p className="text-red-400 font-mono text-sm">{error}</p>}
-          {isDemoMode && !loading && (
-            <div className="flex items-center gap-2 text-yellow-500 bg-yellow-500/10 px-4 py-2 rounded-lg border border-yellow-500/20 text-sm">
-              <Info size={16} />
-              <span>TronGrid API limited or unavailable. Showing <strong>Mock Scenario</strong>.</span>
-            </div>
-          )}
+
         </div>
 
         {/* Dashboard */}

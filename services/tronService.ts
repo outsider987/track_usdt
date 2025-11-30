@@ -1,7 +1,7 @@
 import { Transaction, TransactionType, WalletProfile, RiskAnalysis, RiskLevel } from '../types';
 
 const TRON_GRID_API = 'https://api.trongrid.io/v1';
-const USDT_CONTRACT = 'TJk5kQ5eCbnEGMEcjmJV1YwYGttCkVfeSm'; // Official Tether USDT on Tron
+const USDT_CONTRACT = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t'; // Official Tether USDT on Tron Mainnet
 
 // Real World Known Exchange Hot Wallets (Whitelisted to prevent false positives)
 const KNOWN_EXCHANGES: Record<string, string> = {
@@ -135,8 +135,12 @@ export const fetchTronTransactions = async (address: string): Promise<Transactio
     // To make "Fake Token" detection work, we must assume the user might have clicked a filter "All Tokens" in a real app.
     // Here, we'll fetch USDT history for the UI.
     
+    const headers = {
+      'TRON-PRO-API-KEY': import.meta.env.VITE_TRONGRID_API_KEY || ''
+    };
+    
     const url = `${TRON_GRID_API}/accounts/${address}/transactions/trc20?contract_address=${USDT_CONTRACT}&limit=50`;
-    const response = await fetch(url);
+    const response = await fetch(url, { headers });
     const data = await response.json();
 
     if (!data.data) return [];
@@ -160,8 +164,11 @@ export const fetchTronTransactions = async (address: string): Promise<Transactio
 
 export const fetchTronWalletProfile = async (address: string): Promise<WalletProfile> => {
   try {
+    const headers = {
+      'TRON-PRO-API-KEY': import.meta.env.VITE_TRONGRID_API_KEY || ''
+    };
     const accountUrl = `${TRON_GRID_API}/accounts/${address}`;
-    const accResponse = await fetch(accountUrl);
+    const accResponse = await fetch(accountUrl, { headers });
     const accData = await accResponse.json();
     
     // Handle case where account is new or inactive

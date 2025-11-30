@@ -17,8 +17,9 @@ export const analyzeTransactionsWithGemini = async (
   heuristicRules: string[] = [] // Pass the rules detected by frontend
 ): Promise<RiskAnalysis> => {
   
-  try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    try {
+      
+    const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_API_KEY });
     
     // We only send a subset to avoid huge token usage
     const txContext = JSON.stringify(transactions.slice(0, 30).map(t => ({
